@@ -8,7 +8,7 @@ const Header = (props) => {
             <Logo />
             <span>{props.name}</span>
             <div className={styles.rightSection}>
-                <Button text = "LOGIN" className={styles.btn}/>
+                <Button text = "LOGIN" className="w180"/>
             </div>
         </header>
     )

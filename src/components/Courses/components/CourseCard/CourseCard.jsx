@@ -1,13 +1,11 @@
-import { mockedAuthorsList, mockedCoursesList } from "../../../../constants";
-import formatDuration from "../../../../helpers/formatCreationDate";
-import formatDate from "../../../../helpers/getCourseDuration";
-import Button from "../../../../common/Button/Button";
+import { mockedAuthorsList } from "../../../../constants";
 import styles from "./CourseCard.module.css";
+import Button from "../../../../common/Button/Button";
 
-export default function CourseCard({onCourseClick}) {
+export default function CourseCard({ courses, onCourseClick }) {
   return (
     <div className={styles.container}>
-      {mockedCoursesList.map((course) => (
+      {courses.map((course) => (
         <article key={course.id} className={styles.articles}>
           <div>
             <h3 className={styles.title}>{course.title}</h3>
@@ -26,13 +24,17 @@ export default function CourseCard({onCourseClick}) {
                 </span>
               </p>
               <p>
-                <strong>Duration:</strong> {formatDuration(course.duration)}
+                <strong>Duration:</strong> {course.duration} min
               </p>
               <p>
-                <strong>Created:</strong> {formatDate(course.creationDate)}
+                <strong>Created:</strong> {course.creationDate}
               </p>
             </div>
-            <Button text="SHOW COURSE" onClick = {() => onCourseClick(course)} className={styles.button} />
+            <Button
+              text="SHOW COURSE"
+              className={styles.button}
+              onClick={() => onCourseClick(course)}
+            />
           </div>
         </article>
       ))}

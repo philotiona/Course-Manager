@@ -35,7 +35,7 @@ export default function CourseInfo({ course, onBack }) {
         </article>
       </div>
       <div className={styles.btn}>
-        <Button text="BACK" onClick={onBack} />
+        <Button text="BACK" onClick={onBack} className="w180"/>
 
 
      </div>
