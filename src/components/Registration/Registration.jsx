@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import styles from "./Registration.module.css"
 import Input from "../../common/Input/Input"
 import Button from "../../common/Button/Button"
 
-export default function Registration({ onRegister }) {
+export default function Registration() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,7 +20,6 @@ export default function Registration({ onRegister }) {
       ...prev,
       [name]: value
     }));
-    // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -50,13 +51,29 @@ export default function Registration({ onRegister }) {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
     } else {
-      onRegister(formData);
+      try {
+        const response = await fetch("http://localhost:4000/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(formData)
+        });
+        const data = await response.json()
+        if(response.ok) {
+          navigate("/login");
+        } else {
+          console.error("Error:", data.message);
+        }
+      } catch(err) {
+        console.error("Error:", err)
+      } 
     }
   };
 
@@ -92,7 +109,7 @@ export default function Registration({ onRegister }) {
           className="generic" 
         />
         <Button text="REGISTER" type="submit" className="w300" />
-        <p className={styles.text}>If you have an account you may <span className={styles.login}>Login</span></p>
+        <p className={styles.text}>If you have an account you may <Link><span className={styles.login}>LOGIN</span></Link></p>
       </form>
     </div>
   );

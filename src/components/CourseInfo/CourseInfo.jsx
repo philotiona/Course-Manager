@@ -1,8 +1,15 @@
 import Button from "../../common/Button/Button";
 import styles from "./CourseInfo.module.css";
 import { mockedAuthorsList } from "../../constants";
+import { useParams, Link } from "react-router-dom";
+import PropTypes from "prop-types";
 
-export default function CourseInfo({ course, onBack }) {
+export default function CourseInfo({ onBack, courses }) {
+  const { courseId } = useParams();
+  const course = courses.find((c) => c.id === courseId);
+
+  if (!course) return <div>Course not found</div>;
+
   return (
     <div className={styles.main}>
       <div className={styles.card}>
@@ -27,18 +34,22 @@ export default function CourseInfo({ course, onBack }) {
             </p>
             <p>
               <span className={styles.dataParam}>Authors:</span>{" "}
-              {course.authors.map((authorId) =>
-              mockedAuthorsList.find((a) => a.id === authorId)?.name
-              ).join(", ")}
+              {course.authors
+                .map((authorId) =>
+                  mockedAuthorsList.find((a) => a.id === authorId)?.name
+                )
+                .join(", ")}
             </p>
           </div>
         </article>
       </div>
       <div className={styles.btn}>
-        <Button text="BACK" onClick={onBack} className="w180"/>
-
-
-     </div>
+        <Link to="/courses"><Button text="BACK" onClick={onBack} className="w180" /></Link>
+      </div>
     </div>
   );
+}
+CourseInfo.propTypes = {
+  onBack: PropTypes.func.isRequired,
+  courses: PropTypes.array.isRequired
 }

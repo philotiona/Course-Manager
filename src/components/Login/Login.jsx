@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import style from "./Login.module.css"
 
-export default function Login({handleLoginSubmit}) {
+export default function Login() {
+    const navigate = useNavigate(); 
     const [formData, setFormData] = useState({
         email: '',
         password: ''
@@ -40,14 +42,35 @@ export default function Login({handleLoginSubmit}) {
         return newErrors;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
+        } else {
+            try {
+                const response = await fetch("http://localhost:4000/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                });
+                const data = await response.json()
+                if (response.ok) {
+                    localStorage.setItem("token", data.result.replace('Bearer ', ''));
+                    localStorage.setItem("name", data.user.name);
+                    navigate("/courses");
+                } else {
+                    console.error("Error:", data.message)
+                }
+            } catch(err) {
+                console.error("Error:", err)
+            }
         }
-        handleLoginSubmit?.(formData);
+
+        
     };
 
     return(
@@ -76,7 +99,7 @@ export default function Login({handleLoginSubmit}) {
                 <Button text="LOGIN" type="submit" className="w300"/>
                 <p className={style.text}>
                     If you don't have an account you may <br /> 
-                    <span className={style.span}>Registration</span>
+                    <span className={style.span}><Link to ="/register">REGISTRATION</Link></span>
                 </p>
             </form>
         </div>

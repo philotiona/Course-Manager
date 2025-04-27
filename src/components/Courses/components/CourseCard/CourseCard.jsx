@@ -1,6 +1,7 @@
 import { mockedAuthorsList } from "../../../../constants";
 import styles from "./CourseCard.module.css";
 import Button from "../../../../common/Button/Button";
+import PropTypes from "prop-types";
 
 export default function CourseCard({ courses, onCourseClick }) {
   return (
@@ -32,7 +33,7 @@ export default function CourseCard({ courses, onCourseClick }) {
             </div>
             <Button
               text="SHOW COURSE"
-              className={styles.button}
+              className="w180"
               onClick={() => onCourseClick(course)}
             />
           </div>
@@ -40,4 +41,8 @@ export default function CourseCard({ courses, onCourseClick }) {
       ))}
     </div>
   );
+}
+CourseCard.propTypes = {
+  courses: PropTypes.array.isRequired, 
+  onCourseClick: PropTypes.func.isRequired
 }

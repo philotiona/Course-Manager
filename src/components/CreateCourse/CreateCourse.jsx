@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useState} from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import AuthorItem from "./AuthorItem/AuthorItem";
 import style from "./CreateCourse.module.css";
 import { mockedAuthorsList } from "../../constants";
 import formatDuration from "../../helpers/formatCreationDate";
+import PropTypes from "prop-types"
 
 export default function CreateCourse({ onCreateCourse }) {
+    const  navigate = useNavigate();
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -69,7 +72,10 @@ export default function CreateCourse({ onCreateCourse }) {
             duration: parseInt(formData.duration),
             authors: courseAuthors.map((author) => author.id),
         };
-        if (onCreateCourse) onCreateCourse(newCourse);
+        if (onCreateCourse) {
+            onCreateCourse(newCourse);
+            navigate("/courses")
+        };
         setFormData({ title: "", description: "", duration: "", authorName: "" });
         setCourseAuthors([]);
     };
@@ -201,4 +207,7 @@ export default function CreateCourse({ onCreateCourse }) {
             </form>
         </div>
     );
+}
+CreateCourse.propTypes = {
+    onCreateCourse: PropTypes.func.isRequired
 }
