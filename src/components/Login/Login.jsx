@@ -1,17 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../store/user/actions";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import style from "./Login.module.css"
 
 export default function Login() {
+    const dispatch = useDispatch();
     const navigate = useNavigate(); 
+    const user = useSelector(state => state.user);
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
-    
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        if (user.isAuth || localStorage.getItem("token")) {
+            navigate("/courses");
+        }
+    }, [user.isAuth, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -34,11 +43,9 @@ export default function Login() {
         } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
             newErrors.email = 'Please enter a valid email';
         }
-
         if (!formData.password.trim()) {
             newErrors.password = 'Password is required';
         }
-
         return newErrors;
     };
 
@@ -48,29 +55,12 @@ export default function Login() {
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
             return;
-        } else {
-            try {
-                const response = await fetch("http://localhost:4000/login", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(formData)
-                });
-                const data = await response.json()
-                if (response.ok) {
-                    localStorage.setItem("token", data.result.replace('Bearer ', ''));
-                    localStorage.setItem("name", data.user.name);
-                    navigate("/courses");
-                } else {
-                    console.error("Error:", data.message)
-                }
-            } catch(err) {
-                console.error("Error:", err)
-            }
         }
-
-        
+        try {
+            await dispatch(loginUser(formData));
+        } catch (err) {
+            console.error("Error:", err);
+        }
     };
 
     return(

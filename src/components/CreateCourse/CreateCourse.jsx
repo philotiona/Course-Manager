@@ -1,15 +1,18 @@
-import { useState} from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import AuthorItem from "./AuthorItem/AuthorItem";
 import style from "./CreateCourse.module.css";
-import { mockedAuthorsList } from "../../constants";
 import formatDuration from "../../helpers/formatCreationDate";
-import PropTypes from "prop-types"
+import { useDispatch, useSelector } from "react-redux";
+import { addCourse } from "../../store/courses/actions";
+import { addAuthors } from "../../store/authors/actions";
 
-export default function CreateCourse({ onCreateCourse }) {
-    const  navigate = useNavigate();
+export default function CreateCourse() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const authors = useSelector(state => state.authors) || []; 
     const [formData, setFormData] = useState({
         title: "",
         description: "",
@@ -17,12 +20,14 @@ export default function CreateCourse({ onCreateCourse }) {
         authorName: "",
     });
     const [errors, setErrors] = useState({});
-    const [availableAuthors, setAvailableAuthors] = useState(mockedAuthorsList);
     const [courseAuthors, setCourseAuthors] = useState([]);
+    const availableAuthors = authors.filter(author => 
+        !courseAuthors.find(ca => ca.id === author.id)
+    );
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        
+
         if (name === "duration" && value && !/^\d*$/.test(value)) return;
         setFormData((prev) => ({
             ...prev,
@@ -56,7 +61,6 @@ export default function CreateCourse({ onCreateCourse }) {
         }
         return newErrors;
     };
-
     const handleCreateCourse = (e) => {
         e.preventDefault();
         const validationErrors = validateForm();
@@ -64,6 +68,7 @@ export default function CreateCourse({ onCreateCourse }) {
             setErrors(validationErrors);
             return;
         }
+
         const newCourse = {
             id: Math.random().toString(36).substr(2, 9),
             title: formData.title,
@@ -72,12 +77,9 @@ export default function CreateCourse({ onCreateCourse }) {
             duration: parseInt(formData.duration),
             authors: courseAuthors.map((author) => author.id),
         };
-        if (onCreateCourse) {
-            onCreateCourse(newCourse);
-            navigate("/courses")
-        };
-        setFormData({ title: "", description: "", duration: "", authorName: "" });
-        setCourseAuthors([]);
+
+        dispatch(addCourse(newCourse));
+        navigate("/courses");
     };
 
     const handleCreateAuthor = (e) => {
@@ -93,18 +95,17 @@ export default function CreateCourse({ onCreateCourse }) {
             id: Math.random().toString(36).substr(2, 9),
             name: formData.authorName,
         };
-        setAvailableAuthors((prev) => [...prev, newAuthor]);
+
+        dispatch(addAuthors(newAuthor)); 
         setFormData((prev) => ({ ...prev, authorName: "" }));
         setErrors((prev) => ({ ...prev, authorName: "" }));
     };
 
     const handleAddAuthor = (author) => {
         setCourseAuthors((prev) => [...prev, author]);
-        setAvailableAuthors((prev) => prev.filter((a) => a.id !== author.id));
         setErrors((prev) => ({ ...prev, authors: "" }));
     };
     const handleRemoveAuthor = (author) => {
-        setAvailableAuthors((prev) => [...prev, author]);
         setCourseAuthors((prev) => prev.filter((a) => a.id !== author.id));
     };
 
@@ -207,7 +208,4 @@ export default function CreateCourse({ onCreateCourse }) {
             </form>
         </div>
     );
-}
-CreateCourse.propTypes = {
-    onCreateCourse: PropTypes.func.isRequired
 }

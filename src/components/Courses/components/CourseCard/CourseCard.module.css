@@ -57,9 +57,19 @@
   line-height: 20px;
   letter-spacing: 0px;
 }
-.button {
-  width: 180px;
+
+.trashedit {
+  width: 60px;
   height: 50px;
+  background-color: #007298;
+  border:0;
+  border-radius: 4px;
+
+}
+.btn_wrapper {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
+  gap: 10px;
 }
