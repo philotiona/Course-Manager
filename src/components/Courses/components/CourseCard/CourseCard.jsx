@@ -4,22 +4,32 @@ import styles from "./CourseCard.module.css";
 import Button from "../../../../common/Button/Button";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { deleteCourseThunk } from "../../../../store/courses/thunk";
+import { getAuthors } from "../../../../store/authors/actions";
+import { getCourses } from "../../../../store/courses/actions";
 import { useEffect } from "react";
-import { getAuthors } from "../../../../store/authors/actions.js";
-import { deleteCourse } from "../../../../store/courses/actions.js";
-
 
 export default function CourseCard({ courses, onCourseClick }) {
-  const dispatch = useDispatch()
-  const authors = useSelector(state => state.authors)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleDelete = async (id) => {
+    try {
+        await dispatch(deleteCourseThunk(id));
+        dispatch(getCourses());
+    } catch (error) {
+        console.error("Failed to delete course:", error);
+    }
+  };
+
+  const userRole = useSelector(state => state.user.role);
+  const authors = useSelector(state => state.authors);
+
   useEffect(() => {
-    dispatch(getAuthors())},
-    [dispatch]
-  );
-  console.log("authors", authors)
-  const handleDelete = (courseId) => {
-    dispatch(deleteCourse(courseId))
-  }
+    dispatch(getAuthors());
+  }, [dispatch]);
+
   return (
     <div className={styles.container}>
       {courses.map((course) => (
@@ -52,9 +62,17 @@ export default function CourseCard({ courses, onCourseClick }) {
                 text="SHOW COURSE"
                 className="w180"
                 onClick={() => onCourseClick(course)}
-                />
-              <button className={styles.trashedit}><img src={trash2} alt="trash" onClick={() => handleDelete(course.id)}/></button>
-              <button className = {styles.trashedit}><img src={edit} alt="edit" /></button>
+              />
+              {userRole === "admin" && (
+                <>
+                  <button className={styles.trashedit}>
+                    <img src={trash2} alt="trash" onClick={() => handleDelete(course.id)} />
+                  </button>
+                  <button className={styles.trashedit} onClick={() => navigate(`/courses/update/${course.id}`)}>
+                    <img src={edit} alt="edit" />
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </article>
@@ -62,7 +80,8 @@ export default function CourseCard({ courses, onCourseClick }) {
     </div>
   );
 }
+
 CourseCard.propTypes = {
   courses: PropTypes.array.isRequired, 
   onCourseClick: PropTypes.func.isRequired
-}
+};

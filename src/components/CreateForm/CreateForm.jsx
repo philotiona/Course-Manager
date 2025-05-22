@@ -1,26 +1,33 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../../common/Button/Button";
 import Input from "../../common/Input/Input";
 import AuthorItem from "./AuthorItem/AuthorItem";
-import style from "./CreateCourse.module.css";
+import style from "./CreateForm.module.css";
 import formatDuration from "../../helpers/formatCreationDate";
 import { useDispatch, useSelector } from "react-redux";
-import { addCourse } from "../../store/courses/actions";
-import { addAuthors } from "../../store/authors/actions";
+import { addCourseThunk, updateCourseThunk } from "../../store/courses/thunk";
+import { addAuthorThunk } from "../../store/authors/thunk";
 
 export default function CreateCourse() {
+    const { courseId } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const authors = useSelector(state => state.authors) || []; 
+    const authors = useSelector(state => state.authors) || [];
+    const courses = useSelector(state => state.courses);
+
+    const course = courseId ? courses.find(c => c.id === courseId) : null;
+
     const [formData, setFormData] = useState({
-        title: "",
-        description: "",
-        duration: "",
+        title: course?.title || "",
+        description: course?.description || "",
+        duration: course?.duration?.toString() || "",
         authorName: "",
     });
     const [errors, setErrors] = useState({});
-    const [courseAuthors, setCourseAuthors] = useState([]);
+    const [courseAuthors, setCourseAuthors] = useState(
+        course ? authors.filter(author => course.authors.includes(author.id)) : []
+    );
     const availableAuthors = authors.filter(author => 
         !courseAuthors.find(ca => ca.id === author.id)
     );
@@ -61,7 +68,8 @@ export default function CreateCourse() {
         }
         return newErrors;
     };
-    const handleCreateCourse = (e) => {
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
@@ -69,20 +77,23 @@ export default function CreateCourse() {
             return;
         }
 
-        const newCourse = {
-            id: Math.random().toString(36).substr(2, 9),
+        const courseData = {
             title: formData.title,
             description: formData.description,
-            creationDate: new Date().toLocaleDateString("en-GB"),
             duration: parseInt(formData.duration),
-            authors: courseAuthors.map((author) => author.id),
+            authors: courseAuthors.map(author => author.id)
         };
 
-        dispatch(addCourse(newCourse));
+        if (courseId) {
+            await dispatch(updateCourseThunk(courseId, courseData));
+        } else {
+            await dispatch(addCourseThunk(courseData));
+        }
+        
         navigate("/courses");
     };
 
-    const handleCreateAuthor = (e) => {
+    const handleCreateAuthor = async (e) => {
         e.preventDefault();
         if (formData.authorName.trim().length < 2) {
             setErrors((prev) => ({
@@ -91,12 +102,9 @@ export default function CreateCourse() {
             }));
             return;
         }
-        const newAuthor = {
-            id: Math.random().toString(36).substr(2, 9),
-            name: formData.authorName,
-        };
+        const newAuthor = { name: formData.authorName };
 
-        dispatch(addAuthors(newAuthor)); 
+        await dispatch(addAuthorThunk(newAuthor)); 
         setFormData((prev) => ({ ...prev, authorName: "" }));
         setErrors((prev) => ({ ...prev, authorName: "" }));
     };
@@ -111,8 +119,8 @@ export default function CreateCourse() {
 
     return (
         <div className={style.container}>
-            <h1 className={style.head}>Create Course</h1>
-            <form className={style.box} onSubmit={handleCreateCourse} autoComplete="off">
+            <h1 className={style.head}>{courseId ? 'Update Course' : 'Create Course'}</h1>
+            <form className={style.box} onSubmit={handleSubmit} autoComplete="off">
                 <h3>Main Info</h3>
                 <Input
                     labelText="Title"
@@ -203,7 +211,11 @@ export default function CreateCourse() {
                 </div>
                 <div className={style.buttons}>
                     <Button text="CANCEL" className="w180" type="button" />
-                    <Button text="CREATE COURSE" className="w180" type="submit" />
+                    <Button 
+                        text={courseId ? "UPDATE COURSE" : "CREATE COURSE"} 
+                        className="w180" 
+                        type="submit" 
+                    />
                 </div>
             </form>
         </div>
