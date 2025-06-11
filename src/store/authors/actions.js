@@ -1,5 +1,4 @@
-import GET_AUTHORS from "./types";
-import { ADD_AUTHORS } from "./types";
+import { GET_AUTHORS, ADD_AUTHORS } from "./types";
 import { fetchDataGetAuthors } from "../../services";
 
 export const getAuthors = () => {
@@ -11,7 +10,7 @@ export const getAuthors = () => {
                 payload: authors
             });
         } catch(error) {
-            console.error(`Failed to fecth: ${error}`);
+            console.error(`Failed to fetch: ${error}`);
         }
     }
 }

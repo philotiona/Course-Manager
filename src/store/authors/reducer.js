@@ -1,4 +1,4 @@
-import GET_AUTHORS, { ADD_AUTHORS } from "./types";
+import { GET_AUTHORS, ADD_AUTHORS } from "./types";
 
 const initialState = [];
 

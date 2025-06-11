@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import styles from "./Header.module.css";
 import Logo from "./components/Logo/Logo";
 import Button from "../../common/Button/Button";
-import { logoutUser } from "../../store/user/actions";
+import { logoutUserThunk } from "../../store/user/thunk";
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -11,8 +11,8 @@ const Header = () => {
     const location = useLocation();
     const userName = useSelector(state => state.user.name);
 
-    const handleLogout = () =>  {
-        dispatch(logoutUser());
+    const handleLogout = async () =>  {
+        await dispatch(logoutUserThunk());
         navigate("/login");
     };
 

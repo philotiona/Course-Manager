@@ -4,6 +4,7 @@ const initialState = {
     name: "",
     email:"",
     token: localStorage.getItem("token"),
+    role: "",
 }
 export default function userReducer(state=initialState, action) {
     switch(action.type){
@@ -14,6 +15,7 @@ export default function userReducer(state=initialState, action) {
             name: action.payload.name,
             email: action.payload.email,
             token: action.payload.token,
+            role: action.payload.role, 
         };
         case LOGOUT_USER:
             return {
