@@ -1,0 +1,103 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+  padding: 32px;
+  background-color: #f7f7f7;
+}
+
+.box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 1100px;
+  padding: 32px;
+  background-color: white;
+  border: 1px solid rgb(206, 206, 206);
+  border-radius: 4px;
+  gap: 24px;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: 4fr 2fr;
+  gap: 32px;
+  width: 100%;
+  padding: 20px 0;
+}
+
+.div1,
+.div2,
+.div3 {
+  grid-column: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.div4 {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-left: 24px;
+  border-left: 1px solid rgb(206, 206, 206);
+}
+
+.buttons {
+  width: 1166px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.authorInputGroup {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.head {
+  align-items: flex-start;
+  width: 400px;
+  height: 40px;
+  align-items: center;
+}
+.inputGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 16px;
+  width: 100%;
+}
+
+.durationGroup {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.durationText {
+  margin-bottom: 0;
+  padding-bottom: 12px;
+}
+
+.errorText {
+  color: #ff0000;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.inputError {
+  border-color: #ff0000;
+}
+.buttons {
+  
+}
